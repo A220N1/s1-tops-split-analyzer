@@ -732,3 +732,24 @@ def test_TopsSplitAnalyzer_data3_all_vh():
         os.remove(item)
     os.remove(json_out)
     os.remove(csv_out)
+# Using data2 folder
+def test_TopsSplitAnalyzer_zip_with_rfi_folder(tmp_path):
+    "Recent products hold annotation/rfi/rfi-*.xml files that are not subswath annotations"
+    import zipfile
+
+    rfi_zip = os.path.join(tmp_path, os.path.basename(data2))
+    with zipfile.ZipFile(data2) as src, zipfile.ZipFile(rfi_zip, 'w') as dst:
+        for item in src.infolist():
+            dst.writestr(item, src.read(item))
+        for name in src.namelist():
+            folder, xml = os.path.split(name)
+            if folder.endswith('/annotation') and xml.endswith('.xml'):
+                dst.writestr(f'{folder}/rfi/rfi-{xml}', '<product/>')
+
+    reference = TopsSplitAnalyzer(target_subswaths=['iw1', 'iw2', 'iw3'], polarization='vv')
+    reference.load_zip(zip_path=data2)
+    s1 = TopsSplitAnalyzer(target_subswaths=['iw1', 'iw2', 'iw3'], polarization='vv')
+    s1.load_zip(zip_path=rfi_zip)
+
+    assert s1.metadata_file_list == reference.metadata_file_list
+    assert len(s1.df) == len(reference.df) == 27

@@ -282,12 +282,11 @@ class TopsSplitAnalyzer:
             else:
                 archive_files = self.archive.namelist()
 
-            # Get metadata files
-            regex_filter = r's1(?:a|b|c|d)-iw\d-slc-(?:vv|vh|hh|hv)-.*\.xml'
+            # Get metadata files, directly under annotation/: the calibration/ and rfi/
+            # subfolders hold files with the same name pattern
+            regex_filter = r'(?:^|[/\\])annotation[/\\]s1(?:a|b|c|d)-iw\d-slc-(?:vv|vh|hh|hv)-[^/\\]*\.xml$'
 
             for item in archive_files:
-                if 'calibration' in item:
-                    continue
                 match = re.search(regex_filter, item)
                 if match:
                     self.metadata_file_list.append(item)
