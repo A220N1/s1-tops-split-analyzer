@@ -1,5 +1,5 @@
 .vscode/
-.__pycache__/
+__pycache__/
 *.pyc
 *.zip
 *.shp
@@ -10,3 +10,6 @@
 .idea/
 .ipynb
 *.xml
+build/
+dist/
+*.egg-info/
